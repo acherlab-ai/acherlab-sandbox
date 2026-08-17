@@ -1,0 +1,12 @@
+{
+  "name": "acherlab-sandbox-agent",
+  "version": "1.0.0",
+  "description": "Runs a persistent bash PTY inside a GitHub Actions runner and bridges it to the AcherLab backend over WebSocket",
+  "main": "agent.js",
+  "dependencies": {
+    "ws": "^8.18.0"
+  },
+  "optionalDependencies": {
+    "node-pty": "^1.0.0"
+  }
+}
