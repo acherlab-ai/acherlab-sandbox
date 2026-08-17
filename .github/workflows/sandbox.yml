@@ -22,7 +22,20 @@ jobs:
     name: "AcherLab Sandbox (${{ inputs.username }})"
     runs-on: ubuntu-latest
     timeout-minutes: 135
+    # Isolated Ubuntu container per sandbox
+    container:
+      image: ubuntu:24.04
+      options: --init
     steps:
+      - name: Install base tools
+        run: |
+          apt-get update -qq
+          apt-get install -y -qq --no-install-recommends \
+            curl wget git ca-certificates \
+            python3 python3-pip \
+            build-essential util-linux \
+          && rm -rf /var/lib/apt/lists/*
+
       - name: Checkout
         uses: actions/checkout@v4
 
@@ -33,9 +46,9 @@ jobs:
 
       - name: Install sandbox agent
         working-directory: sandbox/agent
-        run: npm ci
+        run: npm ci --no-audit --no-fund
 
-      - name: Run sandbox agent (120 min TTL)
+      - name: Run sandbox agent (Ubuntu 24.04, TTL 120 min)
         working-directory: sandbox/agent
         env:
           SANDBOX_ID: ${{ inputs.sandbox_id }}
