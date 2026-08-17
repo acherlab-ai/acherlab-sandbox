@@ -1,0 +1,45 @@
+name: acherlab-sandbox
+
+on:
+  workflow_dispatch:
+    inputs:
+      sandbox_id:
+        description: "Unique sandbox id"
+        required: true
+      sandbox_token:
+        description: "Secret token to authenticate with the backend"
+        required: true
+      ws_url:
+        description: "Backend base URL the agent dials back into"
+        required: true
+      username:
+        description: "AcherLab username that owns this sandbox"
+        required: false
+        default: "user"
+
+jobs:
+  sandbox:
+    name: "AcherLab Sandbox (${{ inputs.username }})"
+    runs-on: ubuntu-latest
+    timeout-minutes: 135
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      - name: Install sandbox agent
+        working-directory: sandbox/agent
+        run: npm ci
+
+      - name: Run sandbox agent (120 min TTL)
+        working-directory: sandbox/agent
+        env:
+          SANDBOX_ID: ${{ inputs.sandbox_id }}
+          SANDBOX_TOKEN: ${{ inputs.sandbox_token }}
+          WS_URL: ${{ inputs.ws_url }}
+          SANDBOX_TTL_MS: "7200000"
+        run: node agent.js
